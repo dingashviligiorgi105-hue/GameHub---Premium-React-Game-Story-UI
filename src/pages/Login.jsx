@@ -1,11 +1,34 @@
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../context/authContext";
+import React, { Component } from "react";
+import { Link, Navigate } from "react-router-dom";
+import { AuthContext } from "../context/authContext";
 
-function useRevealOnScroll(deps = []) {
-  useEffect(() => {
+export default class Login extends Component {
+  static contextType = AuthContext;
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      email: "",
+      password: "",
+      remember: true,
+      error: "",
+      redirect: false,
+    };
+
+    this.onSubmit = this.onSubmit.bind(this);
+    this.onEmail = this.onEmail.bind(this);
+    this.onPassword = this.onPassword.bind(this);
+    this.onRemember = this.onRemember.bind(this);
+
+    this.io = null;
+  }
+
+  componentDidMount() {
     const els = document.querySelectorAll(".reveal");
-    const io = new IntersectionObserver(
+    if (!els || !els.length) return;
+
+    this.io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) e.target.classList.add("is-visible");
@@ -14,196 +37,136 @@ function useRevealOnScroll(deps = []) {
       { threshold: 0.15 }
     );
 
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, deps);
-}
-
-export default function Login() {
-  const nav = useNavigate();
-  const auth = useAuth();
-
-  const [email, setEmail] = useState("player@gamehub.com");
-  const [password, setPassword] = useState("123456");
-  const [remember, setRemember] = useState(true);
-  const [error, setError] = useState("");
-
-  const canLogin = useMemo(() => {
-    return String(email).trim().length > 3 && String(password).trim().length >= 3;
-  }, [email, password]);
-
-  useRevealOnScroll([email, password, remember, error]);
-
-  function onSubmit(e) {
-    e.preventDefault();
-    setError("");
-
-    if (!canLogin) {
-      setError("Please enter a valid email and password.");
-      return;
-    }
-
-    if (typeof auth?.login === "function") {
-      auth.login({ email, remember });
-      nav("/profile");
-      return;
-    }
-
-    setError("AuthContext-ში login() ფუნქცია არ ჩანს. მომწერე authContext.jsx და დაგიფიქსავ.");
+    els.forEach((el) => this.io.observe(el));
   }
 
-  return (
-    <div className="page">
-      <section className="section reveal">
-        <div className="authWrap">
-          {/* LEFT: FORM */}
-          <div className="authCard">
-            <div className="authHead">
-              <div className="pill">
-                <span className="dot" />
-                Secure access
+  componentWillUnmount() {
+    if (this.io) this.io.disconnect();
+  }
+
+  canLogin() {
+    const { email, password } = this.state;
+    return String(email).trim().length > 3 && String(password).trim().length >= 4;
+  }
+
+  onSubmit(e) {
+    e.preventDefault();
+    this.setState({ error: "" });
+
+    if (!this.canLogin()) {
+      this.setState({ error: "Please enter a valid email and password." });
+      return;
+    }
+
+    const auth = this.context;
+
+    if (!auth || typeof auth.login !== "function") {
+      this.setState({ error: "Login is not available." });
+      return;
+    }
+
+    const result = auth.login({
+      email: this.state.email,
+      password: this.state.password,
+      remember: this.state.remember,
+    });
+
+    if (result && result.ok) {
+      this.setState({ redirect: true });
+      return;
+    }
+
+    this.setState({ error: (result && result.error) || "Invalid email or password." });
+  }
+
+  onEmail(e) {
+    this.setState({ email: e.target.value });
+  }
+
+  onPassword(e) {
+    this.setState({ password: e.target.value });
+  }
+
+  onRemember(e) {
+    this.setState({ remember: e.target.checked });
+  }
+
+  render() {
+    if (this.state.redirect) {
+      return <Navigate to="/profile" replace />;
+    }
+
+    const { email, password, remember, error } = this.state;
+
+    return (
+      <div className="page">
+        <section className="section reveal">
+          <div className="authWrap">
+            <div className="authCard">
+              <div className="authHead">
+                <div className="pill">
+                  <span className="dot" />
+                  Secure access
+                </div>
+
+                <h1 className="pageTitle">
+                  Login to <span className="gradText">GameHub</span>
+                </h1>
+
+                <p className="pageSubtitle">Sign in to access your profile and manage your cart.</p>
               </div>
 
-              <h1 className="pageTitle">
-                Login to <span className="gradText">GameHub</span>
-              </h1>
-
-              <p className="pageSubtitle">
-                Sign in to access your profile, manage your cart, and keep the checkout flow smooth.
-              </p>
-            </div>
-
-            <form className="form" onSubmit={onSubmit}>
-              <label className="field">
-                <span>Email</span>
-                <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  type="email"
-                  autoComplete="email"
-                />
-              </label>
-
-              <label className="field">
-                <span>Password</span>
-                <input
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  type="password"
-                  autoComplete="current-password"
-                />
-              </label>
-
-              <div className="rowBetween">
-                <label className="check">
+              <form className="form" onSubmit={this.onSubmit}>
+                <label className="field">
+                  <span>Email</span>
                   <input
-                    type="checkbox"
-                    checked={remember}
-                    onChange={(e) => setRemember(e.target.checked)}
+                    value={email}
+                    onChange={this.onEmail}
+                    placeholder="you@example.com"
+                    type="email"
+                    autoComplete="email"
                   />
-                  <span>Remember me</span>
                 </label>
 
-                <Link className="linkSoft" to="/signup">
-                  Create account
-                </Link>
-              </div>
+                <label className="field">
+                  <span>Password</span>
+                  <input
+                    value={password}
+                    onChange={this.onPassword}
+                    placeholder="••••••••"
+                    type="password"
+                    autoComplete="current-password"
+                  />
+                </label>
 
-              {error ? <div className="errorBox">{error}</div> : null}
+                <div className="rowBetween">
+                  <label className="check">
+                    <input type="checkbox" checked={remember} onChange={this.onRemember} />
+                    <span>Remember me</span>
+                  </label>
 
-              <button className="btn btn--primary btn--full" type="submit">
-                Log in
-              </button>
-
-              <div className="authFoot">
-                <span className="muted">Tip:</span> after login open{" "}
-                <Link className="linkSoft" to="/profile">
-                  /profile
-                </Link>{" "}
-                (ProtectedRoute).
-              </div>
-            </form>
-          </div>
-
-          {/* RIGHT: PREMIUM PANEL */}
-          <div className="authSide reveal">
-            <div className="loginSideCard">
-              <div className="loginSideTop">
-                <div>
-                  <div className="pill" style={{ marginBottom: 10 }}>
-                    <span className="dot" />
-                    Premium perks
-                  </div>
-                  <div className="loginSideTitle">Unlock your dashboard</div>
-                  <div className="loginSideDesc">
-                    Your profile + cart become fully interactive after authentication.
-                  </div>
+                  <Link className="linkSoft" to="/signup">
+                    Create account
+                  </Link>
                 </div>
 
-                <div className="loginSideChip">Protected</div>
-              </div>
+                {error ? <div className="errorBox">{error}</div> : null}
 
-              <div className="loginSideGrid">
-                <div className="loginSideStat">
-                  <div className="loginSideStatLabel">Access</div>
-                  <div className="loginSideStatValue">Profile</div>
+                <button className="btn btn--primary btn--full" type="submit">
+                  Log in
+                </button>
+
+                <div className="authFoot">
+                  No account?{" "}
+                  <Link className="linkSoft" to="/signup">
+                    Signup
+                  </Link>
                 </div>
-                <div className="loginSideStat">
-                  <div className="loginSideStatLabel">Cart</div>
-                  <div className="loginSideStatValue">Saved</div>
-                </div>
-                <div className="loginSideStat">
-                  <div className="loginSideStatLabel">UI</div>
-                  <div className="loginSideStatValue">Premium</div>
-                </div>
-              </div>
-
-              <ul className="loginSideList">
-                <li className="loginSideItem">
-                  <span className="loginSideIcon">✓</span>
-                  <div>
-                    <div className="loginSideItemTitle">Protected Profile page</div>
-                    <div className="loginSideItemText">Only logged-in users can open /profile.</div>
-                  </div>
-                </li>
-
-                <li className="loginSideItem">
-                  <span className="loginSideIcon">✓</span>
-                  <div>
-                    <div className="loginSideItemTitle">Cleaner checkout flow</div>
-                    <div className="loginSideItemText">Cart stays consistent with LocalStorage.</div>
-                  </div>
-                </li>
-
-                <li className="loginSideItem">
-                  <span className="loginSideIcon">✓</span>
-                  <div>
-                    <div className="loginSideItemTitle">Fast browsing experience</div>
-                    <div className="loginSideItemText">Search + filters keep products navigation smooth.</div>
-                  </div>
-                </li>
-              </ul>
-
-              <div className="loginSideActions">
-                <Link className="btn btn--ghost" to="/products">
-                  Back to Products
-                </Link>
-                <Link className="btn btn--primary" to="/cart">
-                  Open Cart
-                </Link>
-              </div>
-
-              <div className="loginSideFooter">
-                Test account: <b>player@gamehub.com</b> / <b>123456</b>
-              </div>
-
-              <div className="noise" />
+              </form>
             </div>
           </div>
-        </div>
-      </section>
-    </div>
-  );
+        </section>
+      </div>
+    );
+  }
 }

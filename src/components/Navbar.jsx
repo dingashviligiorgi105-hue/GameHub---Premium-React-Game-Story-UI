@@ -1,45 +1,60 @@
-import { NavLink } from "react-router-dom";
-import { useCart } from "../context/cartContext";
+import React, { Component } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { CartContext } from "../context/cartContext";
+import { AuthContext } from "../context/authContext";
 
-export default function Navbar() {
-  const { totalItems } = useCart();
+export default class Navbar extends Component {
+  render() {
+    return (
+      <AuthContext.Consumer>
+        {(auth) => (
+          <CartContext.Consumer>
+            {(cartCtx) => {
+              const totalItems = Number((cartCtx && cartCtx.totalItems) || 0);
+              const user = auth && auth.user;
 
-  const count = Number(totalItems || 0);
-  const badgeText = count > 99 ? "99+" : String(count);
+              return (
+                <header className="nav">
+                  <div className="container navInner">
+                    <Link to="/" className="brand">
+                      <span className="brandDot" />
+                      GameHub
+                    </Link>
 
-  const navItemClass = ({ isActive }) => (isActive ? "active" : "");
-  const pillClass = ({ isActive }) => `pill${isActive ? " active" : ""}`;
+                    <nav className="navLinks">
+                      <NavLink className="navLink" to="/">
+                        Home
+                      </NavLink>
 
-  return (
-    <header className="nav">
-      <div className="container nav-inner">
-        <NavLink to="/" className="brand" aria-label="GameHub Home">
-          <span className="brand-badge" aria-hidden="true" />
-          <span>GameHub</span>
-        </NavLink>
+                      <NavLink className="navLink" to="/products">
+                        Products
+                      </NavLink>
 
-        <nav className="nav-links" aria-label="Primary navigation">
-          <NavLink to="/" end className={navItemClass}>
-            Home
-          </NavLink>
-          <NavLink to="/products" className={navItemClass}>
-            Products
-          </NavLink>
-          <NavLink to="/about" className={navItemClass}>
-            About
-          </NavLink>
-        </nav>
+                      <NavLink className="navLink" to="/cart">
+                        Cart <span className="badge">{totalItems}</span>
+                      </NavLink>
 
-        <div className="nav-right">
-          <NavLink to="/cart" className={pillClass}>
-            Cart <span className="badge">{badgeText}</span>
-          </NavLink>
+                      <NavLink className="navLink" to="/about">
+                        About
+                      </NavLink>
 
-          <NavLink to="/login" className={pillClass}>
-            Login
-          </NavLink>
-        </div>
-      </div>
-    </header>
-  );
+                      {user ? (
+                        <NavLink className="navLink" to="/profile">
+                          Profile
+                        </NavLink>
+                      ) : (
+                        <NavLink className="navLink" to="/login">
+                          Login
+                        </NavLink>
+                      )}
+                    </nav>
+                  </div>
+                </header>
+              );
+            }}
+          </CartContext.Consumer>
+        )}
+      </AuthContext.Consumer>
+    );
+  }
 }

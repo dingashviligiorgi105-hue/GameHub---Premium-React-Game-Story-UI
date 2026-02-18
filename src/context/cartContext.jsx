@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, Component } from "react";
 
-const CartContext = createContext(null);
+export const CartContext = createContext(null);
+
 const CART_KEY = "gh_cart";
 
 function normalizeCart(value) {
@@ -24,74 +25,113 @@ function readCart() {
   }
 }
 
-export function CartProvider({ children }) {
-  const [cart, setCart] = useState(readCart);
+function writeCart(cart) {
+  try {
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  } catch {
+    return;
+  }
+}
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(CART_KEY, JSON.stringify(cart));
-    } catch {
-      // ignore storage errors
+export class CartProvider extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      cart: [],
+    };
+
+    this.addToCart = this.addToCart.bind(this);
+    this.removeFromCart = this.removeFromCart.bind(this);
+    this.inc = this.inc.bind(this);
+    this.dec = this.dec.bind(this);
+  }
+
+  componentDidMount() {
+    this.setState({ cart: readCart() });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.cart !== this.state.cart) {
+      writeCart(this.state.cart);
     }
-  }, [cart]);
+  }
 
-  function addToCart(item) {
-    if (!item?.id) return;
+  addToCart(item) {
+    if (!item || !item.id) return;
 
-    setCart((prev) => {
+    this.setState((state) => {
+      const prev = state.cart;
       const found = prev.find((x) => x.id === item.id);
 
       if (found) {
-        return prev.map((x) =>
-          x.id === item.id ? { ...x, qty: Number(x.qty || 0) + 1 } : x
-        );
+        return {
+          cart: prev.map((x) =>
+            x.id === item.id ? { ...x, qty: Number(x.qty || 0) + 1 } : x
+          ),
+        };
       }
 
-      return [...prev, { ...item, qty: 1 }];
+      return { cart: [...prev, { ...item, qty: 1 }] };
     });
   }
 
-  function removeFromCart(id) {
-    setCart((prev) => prev.filter((x) => x.id !== id));
+  removeFromCart(id) {
+    this.setState((state) => ({
+      cart: state.cart.filter((x) => x.id !== id),
+    }));
   }
 
-  function inc(id) {
-    setCart((prev) =>
-      prev.map((x) => (x.id === id ? { ...x, qty: Number(x.qty || 0) + 1 } : x))
-    );
+  inc(id) {
+    this.setState((state) => ({
+      cart: state.cart.map((x) =>
+        x.id === id ? { ...x, qty: Number(x.qty || 0) + 1 } : x
+      ),
+    }));
   }
 
-  function dec(id) {
-    setCart((prev) =>
-      prev
+  dec(id) {
+    this.setState((state) => ({
+      cart: state.cart
         .map((x) =>
           x.id === id ? { ...x, qty: Number(x.qty || 0) - 1 } : x
         )
-        .filter((x) => Number(x.qty || 0) > 0)
+        .filter((x) => Number(x.qty || 0) > 0),
+    }));
+  }
+
+  getTotalItems(cart) {
+    return cart.reduce((s, x) => s + Number(x.qty || 0), 0);
+  }
+
+  getTotalPrice(cart) {
+    return cart.reduce(
+      (s, x) => s + Number(x.qty || 0) * Number(x.price || 0),
+      0
     );
   }
 
-  const totalItems = useMemo(
-    () => cart.reduce((s, x) => s + Number(x.qty || 0), 0),
-    [cart]
-  );
+  render() {
+    const cart = this.state.cart;
+    const totalItems = this.getTotalItems(cart);
+    const totalPrice = this.getTotalPrice(cart);
 
-  const totalPrice = useMemo(
-    () => cart.reduce((s, x) => s + Number(x.qty || 0) * Number(x.price || 0), 0),
-    [cart]
-  );
+    const value = {
+      cart,
+      addToCart: this.addToCart,
+      removeFromCart: this.removeFromCart,
+      inc: this.inc,
+      dec: this.dec,
+      totalItems,
+      totalPrice,
+    };
 
-  return (
-    <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, inc, dec, totalItems, totalPrice }}
-    >
-      {children}
-    </CartContext.Provider>
-  );
+    return (
+      <CartContext.Provider value={value}>
+        {this.props.children}
+      </CartContext.Provider>
+    );
+  }
 }
 
-export function useCart() {
-  const ctx = useContext(CartContext);
-  if (!ctx) throw new Error("useCart must be used inside <CartProvider>");
-  return ctx;
-}
+export const CartConsumer = CartContext.Consumer;

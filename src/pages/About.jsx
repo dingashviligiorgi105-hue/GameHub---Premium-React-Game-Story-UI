@@ -1,184 +1,115 @@
-import { useEffect } from "react";
+import React, { Component } from "react";
 import { Link } from "react-router-dom";
 
-function useRevealOnScroll(deps = []) {
-  useEffect(() => {
+export default class About extends Component {
+  constructor(props) {
+    super(props);
+    this.io = null;
+  }
+
+  componentDidMount() {
     const els = document.querySelectorAll(".reveal");
-    const io = new IntersectionObserver(
+    if (!els || !els.length) return;
+
+    this.io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) e.target.classList.add("is-visible");
         });
       },
-      { threshold: 0.15 }
+      { threshold: 0.12 }
     );
 
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, deps);
-}
+    els.forEach((el) => this.io.observe(el));
+  }
 
-export default function About() {
-  useRevealOnScroll([]);
+  componentWillUnmount() {
+    if (this.io) this.io.disconnect();
+  }
 
-  return (
-    <div className="page">
-      <div className="container">
-        {/* HERO */}
-        <section className="section">
-          <div className="pageHeader reveal">
+  render() {
+    return (
+      <div className="page">
+        <section className="section reveal">
+          <div className="pageHeader">
             <div className="pill">
               <span className="dot" />
-              About GameHub
+              About this project
             </div>
 
             <h1 className="pageTitle">
-              A premium <span className="gradText">game store</span> UI
+              Premium <span className="gradText">GameHub</span> UI
             </h1>
 
             <p className="pageSubtitle">
-              This project simulates a real video-game marketplace: products, cart, login, protected
-              profile, and modern visuals.
+              A small React storefront UI that focuses on clean layout, strong colors, and simple cart logic.
+              This build is made for learning and practicing component structure.
             </p>
 
             <div className="headerActions">
               <Link className="btn btn--primary" to="/products">
-                Explore Products
+                Explore products
               </Link>
-              <Link className="btn btn--ghost" to="/login">
-                Sign in
+
+              <Link className="btn btn--ghost" to="/">
+                Back home
               </Link>
             </div>
           </div>
         </section>
 
-        {/* HOW IT WORKS */}
-        <section className="section">
-          <div className="sectionRow reveal">
-            <h2 className="howTitle">
-              How it <span className="howAccent">works</span>
-            </h2>
+        <section className="section reveal">
+          <div className="aboutGrid">
+            <div className="glassPanel">
+              <h2 className="h2" style={{ marginTop: 0 }}>
+                What you can do
+              </h2>
 
-            <div className="howHint">Simple flow • Fast UI • Smooth animations</div>
-          </div>
+              <ul className="list">
+                <li>Browse games and filter by category</li>
+                <li>Add / remove items from the cart</li>
+                <li>Cart persists via LocalStorage</li>
+                <li>Protected profile route (login required)</li>
+              </ul>
 
-          <div className="howGrid">
-            <div className="howCard reveal">
-              <div className="howBadge">1</div>
-              <div>
-                <div className="howCardTitle">Browse games</div>
-                <div className="howCardText">
-                  Products page shows games with posters, category and price. Use filters + search.
-                </div>
+              <div className="hr" />
 
-                <div className="howMiniRow">
-                  <span className="howMiniPill">Search</span>
-                  <span className="howMiniPill">Category</span>
-                  <span className="howMiniPill">Price</span>
-                </div>
+              <div className="row">
+                <span className="tagGold">UI</span>
+                <span className="tagRose">Cart</span>
+                <span className="tag">Routing</span>
               </div>
+
+              <div className="noise" />
             </div>
 
-            <div className="howCard reveal">
-              <div className="howBadge">2</div>
-              <div>
-                <div className="howCardTitle">Add to cart</div>
-                <div className="howCardText">
-                  Add items, change quantity, remove items. Totals update instantly.
-                </div>
+            <div className="glassPanel">
+              <h2 className="h2" style={{ marginTop: 0 }}>
+                Notes
+              </h2>
 
-                <div className="howMiniRow">
-                  <span className="howMiniPill">+ / − qty</span>
-                  <span className="howMiniPill">Remove</span>
-                  <span className="howMiniPill">Total</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="howCard reveal">
-              <div className="howBadge">3</div>
-              <div>
-                <div className="howCardTitle">Login & profile</div>
-                <div className="howCardText">
-                  Login unlocks Profile. ProtectedRoute blocks it if user is not logged in.
-                </div>
-
-                <div className="howMiniRow">
-                  <span className="howMiniPill">Auth</span>
-                  <span className="howMiniPill">Protected</span>
-                  <span className="howMiniPill">Profile</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="howCard reveal">
-              <div className="howBadge">4</div>
-              <div>
-                <div className="howCardTitle">Persistent state</div>
-                <div className="howCardText">
-                  Cart is saved to LocalStorage — refresh and items stay.
-                </div>
-
-                <div className="howMiniRow">
-                  <span className="howMiniPill">LocalStorage</span>
-                  <span className="howMiniPill">Saved cart</span>
-                  <span className="howMiniPill">No loss</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* TECH + FEATURES */}
-        <section className="section">
-          <h2 className="sectionTitle reveal">Tech + features</h2>
-
-          <div className="cards3">
-            <div className="infoCard reveal">
-              <div className="infoCard__icon">⚛️</div>
-              <div className="infoCard__title">React + Router</div>
-              <div className="infoCard__text">
-                Pages, navigation, protected routes, clean component structure.
-              </div>
-            </div>
-
-            <div className="infoCard reveal">
-              <div className="infoCard__icon">🧠</div>
-              <div className="infoCard__title">Context API</div>
-              <div className="infoCard__text">AuthContext + CartContext for global state.</div>
-            </div>
-
-            <div className="infoCard reveal">
-              <div className="infoCard__icon">🎨</div>
-              <div className="infoCard__title">Premium UI</div>
-              <div className="infoCard__text">
-                Glass effect, gradients, hover/press animations, scroll reveals.
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="section">
-          <div className="cta reveal">
-            <div>
-              <h2 className="cta__title">Want to test the flow?</h2>
-              <p className="cta__text">
-                Add a few games to the cart, then login and open your profile page.
+              <p className="sectionText">
+                This project uses a simple fake login flow for learning purposes. You can extend it with a real backend
+                later. The main goal is to practice page routing, shared state (Context), and clean UI.
               </p>
-            </div>
 
-            <div className="cta__actions">
-              <Link className="btn btn--primary" to="/products">
-                Add games
-              </Link>
-              <Link className="btn btn--ghost" to="/cart">
-                Open cart
-              </Link>
+              <div className="hr" />
+
+              <div className="rowBetween">
+                <Link className="linkSoft" to="/login">
+                  Login
+                </Link>
+
+                <Link className="linkSoft" to="/signup">
+                  Signup
+                </Link>
+              </div>
+
+              <div className="noise" />
             </div>
           </div>
         </section>
       </div>
-    </div>
-  );
+    );
+  }
 }

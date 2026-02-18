@@ -1,31 +1,42 @@
 // === IMPORTS ===
-import detroit from "../assets/games/detroit.webp";
+import detroit from "../assets/games/detroit.jpg";
 import ac2 from "../assets/games/ac2.jpg";
-import batman from "../assets/games/batman.webp";
+import batman from "../assets/games/batman.jpg";
 import dyingLight from "../assets/games/dying-light.jpg";
 import fc24 from "../assets/games/fc24.jpg";
 import gowRagnarok from "../assets/games/gow-ragnarok.jpg";
 import gow from "../assets/games/gow.jpg";
-import gta5 from "../assets/games/gta5.png";
+import gta5 from "../assets/games/gta5.jpg";
 import halfLife from "../assets/games/half-life.jpg";
-import horizon from "../assets/games/horizon.webp";
+import horizon from "../assets/games/horizon.jpg";
 import spiderMiles from "../assets/games/spiderman-miles.jpg";
-import rdr2 from "../assets/games/rdr2.avif";
+import rdr2 from "../assets/games/rdr2.jpg";
 import re2 from "../assets/games/re2.jpg";
 import re7 from "../assets/games/re7.jpg";
 import silentHill2 from "../assets/games/silent-hill-2.jpg";
-import spiderman2 from "../assets/games/spiderman2.avif";
+import spiderman2 from "../assets/games/spiderman2.jpg";
 import spiderman2018 from "../assets/games/spiderman2018.jpg";
 import tlou1 from "../assets/games/tlou1.jpg";
-import tlou2 from "../assets/games/tlou2.png";
+import tlou2 from "../assets/games/tlou2.jpg";
 import tombRaider from "../assets/games/tomb-raider.jpg";
 import uncharted4 from "../assets/games/uncharted4.jpg";
 import witcher3 from "../assets/games/witcher3.jpg";
 
-// === NEW GAMES ===
+// === ALREADY ADDED BEFORE ===
 import gta6 from "../assets/games/gta6.jpg";
-import mw2 from "../assets/games/mw2.avif";
+import mw2 from "../assets/games/mw2.jpg";
 import cs2 from "../assets/games/cs2.jpg";
+
+// === NEW 9 GAMES (you added) ===
+import cyberpunk2077 from "../assets/games/cyberpunk2077.jpg";
+import battlefield6 from "../assets/games/battlefield6.jpg";
+import eldenRing from "../assets/games/elder-ring.jpg";
+import blackMythWukong from "../assets/games/black-myth-wukong.jpg";
+import forzaHorizon5 from "../assets/games/forza_horizon_5.jpg";
+import madMax from "../assets/games/mad-max.jpg";
+import mafiaOldCountry from "../assets/games/mafia-the-old-country.jpg";
+import ghostOfTsushima from "../assets/games/ghost-of-tsushima.jpg";
+import ghostOfYotei from "../assets/games/ghost-of-yotei.jpg";
 
 // === DATA ===
 export const games = [
@@ -59,8 +70,19 @@ export const games = [
   { id: 21, title: "Assassin's Creed II", price: 9.99, category: "action", image: ac2 },
   { id: 22, title: "Half-Life", price: 7.99, category: "classic", image: halfLife },
 
-  // === NEWLY ADDED ===
-  { id: 23, title: "GTA 6", price: 80, category: "action", image: gta6 },
+  // === PREVIOUS NEWLY ADDED ===
+  { id: 23, title: "GTA 6", price: 80.0, category: "action", image: gta6 },
   { id: 24, title: "Call of Duty: MW2", price: 59.99, category: "shooter", image: mw2 },
   { id: 25, title: "CS2", price: 0, category: "shooter", image: cs2 },
+
+  // === 9 NEW GAMES (ADDED NOW) ===
+  { id: 26, title: "Cyberpunk 2077", price: 29.99, category: "rpg", image: cyberpunk2077 },
+  { id: 27, title: "Battlefield 6", price: 69.99, category: "shooter", image: battlefield6 },
+  { id: 28, title: "Elden Ring", price: 59.99, category: "rpg", image: eldenRing },
+  { id: 29, title: "Black Myth: Wukong", price: 59.99, category: "action", image: blackMythWukong },
+  { id: 30, title: "Forza Horizon 5", price: 49.99, category: "racing", image: forzaHorizon5 },
+  { id: 31, title: "Mad Max", price: 9.99, category: "action", image: madMax },
+  { id: 32, title: "Mafia: The Old Country", price: 59.99, category: "story", image: mafiaOldCountry },
+  { id: 33, title: "Ghost of Tsushima", price: 39.99, category: "action", image: ghostOfTsushima },
+  { id: 34, title: "Ghost of Yotei", price: 69.99, category: "action", image: ghostOfYotei },
 ];
