@@ -22,12 +22,10 @@ import tombRaider from "../assets/games/tomb-raider.jpg";
 import uncharted4 from "../assets/games/uncharted4.jpg";
 import witcher3 from "../assets/games/witcher3.jpg";
 
-// === ALREADY ADDED BEFORE ===
 import gta6 from "../assets/games/gta6.jpg";
 import mw2 from "../assets/games/mw2.jpg";
 import cs2 from "../assets/games/cs2.jpg";
 
-// === NEW 9 GAMES (you added) ===
 import cyberpunk2077 from "../assets/games/cyberpunk2077.jpg";
 import battlefield6 from "../assets/games/battlefield6.jpg";
 import eldenRing from "../assets/games/elder-ring.jpg";
@@ -70,12 +68,10 @@ export const games = [
   { id: 21, title: "Assassin's Creed II", price: 9.99, category: "action", image: ac2 },
   { id: 22, title: "Half-Life", price: 7.99, category: "classic", image: halfLife },
 
-  // === PREVIOUS NEWLY ADDED ===
   { id: 23, title: "GTA 6", price: 80.0, category: "action", image: gta6 },
   { id: 24, title: "Call of Duty: MW2", price: 59.99, category: "shooter", image: mw2 },
   { id: 25, title: "CS2", price: 0, category: "shooter", image: cs2 },
 
-  // === 9 NEW GAMES (ADDED NOW) ===
   { id: 26, title: "Cyberpunk 2077", price: 29.99, category: "rpg", image: cyberpunk2077 },
   { id: 27, title: "Battlefield 6", price: 69.99, category: "shooter", image: battlefield6 },
   { id: 28, title: "Elden Ring", price: 59.99, category: "rpg", image: eldenRing },
